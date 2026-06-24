@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+    <!-- Profile Card -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center p-4">
+                <!-- Avatar -->
+                <div style="
+                    width: 80px; height: 80px; border-radius: 50%;
+                    background-color: {{ user.avatar_color or '#e94560' }};
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 2rem; font-weight: bold; color: white;
+                    margin: 0 auto 15px auto;">
+                    {{ user.name[0].upper() }}
+                </div>
+
+                <h3 class="mb-1" style="color: #ffffff;">{{ user.name }}</h3>
+
+                {% if user.username %}
+                <p style="color: #e94560;" class="mb-1">@{{ user.username }}</p>
+                {% endif %}
+
+                <p style="color: #a0a0b0;" class="mb-3">Member since {{ user.created_at.strftime('%b %Y') }}</p>
+
+                {% if current_user.is_authenticated and current_user.id == user.id %}
+                <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-sm btn-outline-danger mb-3">✏️ Edit Profile</a>
+                {% endif %}
+
+                <hr style="border-color: #2a2a4a;">
+                <div class="row text-center mt-3">
+                    <div class="col-4">
+                        <div class="text-danger fw-bold fs-4">{{ user.reputation }}</div>
+                        <small style="color: #a0a0b0;">Reputation</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-danger fw-bold fs-4">{{ ideas|length }}</div>
+                        <small style="color: #a0a0b0;">Ideas</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-danger fw-bold fs-4">{{ reviews_given }}</div>
+                        <small style="color: #a0a0b0;">Reviews</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reputation Badge -->
+        <div class="card mb-4">
+            <div class="card-body text-center p-3">
+                {% if user.reputation >= 100 %}
+                    <div style="font-size: 2rem;">🏆</div>
+                    <div class="text-warning fw-bold">Champion</div>
+                {% elif user.reputation >= 50 %}
+                    <div style="font-size: 2rem;">⭐</div>
+                    <div class="text-warning fw-bold">Rising Star</div>
+                {% elif user.reputation >= 20 %}
+                    <div style="font-size: 2rem;">🔥</div>
+                    <div class="text-danger fw-bold">Active Member</div>
+                {% else %}
+                    <div style="font-size: 2rem;">🌱</div>
+                    <div class="text-success fw-bold">Newcomer</div>
+                {% endif %}
+                <small style="color: #a0a0b0;">{{ user.reputation }} reputation points</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ideas Section -->
+    <div class="col-md-8">
+        <h4 class="mb-3" style="color: #ffffff;">💡 Ideas by {{ user.name }}</h4>
+        {% if ideas %}
+            {% for idea in ideas %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge badge-category mb-1">{{ idea.category }}</span>
+                            <h5 class="mb-1" style="color: #ffffff;">{{ idea.title }}</h5>
+                            <p style="color: #a0a0b0;" class="mb-2">{{ idea.description[:120] }}...</p>
+                            <small style="color: #a0a0b0;">
+                                📅 {{ idea.created_at.strftime('%d %b %Y') }} •
+                                💬 {{ idea.reviews|length }} reviews
+                            </small>
+                        </div>
+                        <a href="{{ url_for('ideas.idea_detail', idea_id=idea.id) }}"
+                           class="btn btn-sm btn-primary ms-3">View →</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center p-4">
+                    <p style="color: #a0a0b0;">No ideas submitted yet.</p>
+                    {% if current_user.is_authenticated and current_user.id == user.id %}
+                        <a href="{{ url_for('ideas.submit') }}" class="btn btn-primary">Submit Your First Idea</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col">
+        <h2>🔥 Trending Ideas</h2>
+        <p style="color: #a0a0b0;">Most reviewed and highest rated ideas</p>
+    </div>
+</div>
+
+{% if trending_ideas %}
+    {% for idea, review_count, avg_rating in trending_ideas %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <!-- Rank Number -->
+                <div class="col-1 text-center">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #e94560;">
+                        #{{ loop.index }}
+                    </div>
+                </div>
+
+                <!-- Idea Info -->
+                <div class="col-md-7">
+                    <span class="badge badge-category mb-1">{{ idea.category }}</span>
+                    <h5 class="mb-1" style="color: #ffffff;">{{ idea.title }}</h5>
+                    <p style="color: #a0a0b0;" class="mb-1">{{ idea.description[:100] }}...</p>
+                    <small style="color: #a0a0b0;">by {{ idea.author.name }}</small>
+                </div>
+
+                <!-- Stats -->
+                <div class="col-md-3 text-center">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-danger fw-bold fs-5">{{ review_count }}</div>
+                            <small style="color: #a0a0b0;">Reviews</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-danger fw-bold fs-5">
+                                {% if avg_rating %}
+                                    {{ "%.1f"|format(avg_rating) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                            <small style="color: #a0a0b0;">Avg Rating</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Button -->
+                <div class="col-1 text-end">
+                    <a href="{{ url_for('ideas.idea_detail', idea_id=idea.id) }}" 
+                       class="btn btn-sm btn-primary">View →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% else %}
+    <div class="card">
+        <div class="card-body text-center p-5">
+            <h4 style="color: #ffffff;">No trending ideas yet!</h4>
+            <p style="color: #a0a0b0;">Submit and review ideas to see them here.</p>
+            <a href="{{ url_for('ideas.submit') }}" class="btn btn-primary">Submit Idea</a>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

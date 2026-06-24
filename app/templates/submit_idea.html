@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h3 class="mb-1">💡 Submit Your Idea</h3>
+                <p class="text-muted mb-4">Costs 20 reputation points • You have {{ current_user.reputation }} pts</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control bg-dark text-light border-secondary" 
+                               placeholder="e.g. AI-powered resume builder" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" rows="5" class="form-control bg-dark text-light border-secondary" 
+                                  placeholder="Describe your idea in detail..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select bg-dark text-light border-secondary">
+                            <option>Mobile App</option>
+                            <option>Web Application</option>
+                            <option>SaaS</option>
+                            <option>AI Tool</option>
+                            <option>Startup</option>
+                            <option>E-Commerce</option>
+                            <option>Education</option>
+                            <option>Gaming</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Tags</label>
+                        <input type="text" name="tags" class="form-control bg-dark text-light border-secondary" 
+                               placeholder="e.g. python, ai, mobile">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit Idea 🚀</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

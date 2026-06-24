@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col">
+        <h2>💡 Latest Ideas</h2>
+        <p class="text-muted">Discover and validate ideas from the community</p>
+    </div>
+    <div class="col text-end">
+        <a href="{{ url_for('ideas.submit') }}" class="btn btn-primary">
+            + Submit Your Idea
+        </a>
+    </div>
+</div>
+
+{% if ideas %}
+    <div class="row">
+        {% for idea in ideas %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="badge badge-category mb-2">{{ idea.category }}</span>
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <p class="card-text text-muted">{{ idea.description[:150] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">by {{ idea.author.name }}</small>
+                        <a href="{{ url_for('ideas.idea_detail', idea_id=idea.id) }}" 
+                           class="btn btn-sm btn-primary">View →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center mt-5">
+        <h4>No ideas yet!</h4>
+        <p class="text-muted">Be the first to submit an idea 🚀</p>
+        <a href="{{ url_for('ideas.submit') }}" class="btn btn-primary">Submit Idea</a>
+    </div>
+{% endif %}
+
+{% endblock %}

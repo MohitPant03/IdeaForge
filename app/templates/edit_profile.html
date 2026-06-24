@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h3 class="mb-4" style="color: #ffffff;">✏️ Edit Profile</h3>
+
+                <!-- Avatar Preview -->
+                <div class="text-center mb-4">
+                    <div id="avatar-preview" style="
+                        width: 80px; height: 80px; border-radius: 50%;
+                        background-color: {{ current_user.avatar_color or '#e94560' }};
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 2rem; font-weight: bold; color: white;
+                        margin: 0 auto;">
+                        {{ current_user.name[0].upper() }}
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label class="form-label" style="color: #e0e0e0;">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark text-danger border-secondary">@</span>
+                            <input type="text" name="username"
+                                   value="{{ current_user.username or '' }}"
+                                   class="form-control bg-dark text-light border-secondary"
+                                   placeholder="yourname">
+                        </div>
+                        <small style="color: #a0a0b0;">Lowercase only, no spaces</small>
+                    </div>
+
+                    <!-- Avatar Color -->
+                    <div class="mb-4">
+                        <label class="form-label" style="color: #e0e0e0;">Avatar Color</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for color in ['#e94560', '#6c63ff', '#00b894', '#fd79a8', '#fdcb6e', '#0984e3', '#e17055', '#00cec9'] %}
+                            <div onclick="selectColor('{{ color }}')"
+                                 style="width: 35px; height: 35px; border-radius: 50%;
+                                        background-color: {{ color }}; cursor: pointer;
+                                        border: 3px solid {{ 'white' if current_user.avatar_color == color else 'transparent' }};"
+                                 id="color-{{ loop.index }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="avatar_color" id="avatar_color"
+                               value="{{ current_user.avatar_color or '#e94560' }}">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Changes ✅</button>
+                        <a href="{{ url_for('profile.my_profile') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectColor(color) {
+    document.getElementById('avatar_color').value = color;
+    document.getElementById('avatar-preview').style.backgroundColor = color;
+    // Border update
+    document.querySelectorAll('[id^="color-"]').forEach(el => {
+        el.style.border = '3px solid transparent';
+    });
+    event.target.style.border = '3px solid white';
+}
+</script>
+
+{% endblock %}

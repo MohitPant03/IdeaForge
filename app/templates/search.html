@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Search Bar -->
+        <div class="card mb-4">
+            <div class="card-body p-4">
+                <h4 class="mb-3" style="color: #ffffff;">🔍 Search Ideas</h4>
+                <form method="GET" action="{{ url_for('ideas.search') }}">
+                    <div class="input-group">
+                        <input type="text" name="q" value="{{ query }}"
+                               class="form-control bg-dark text-light border-secondary"
+                               placeholder="Search by title, category, tags..."
+                               autofocus>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        {% if query %}
+            <p style="color: #a0a0b0;" class="mb-3">
+                {% if results %}
+                    {{ results|length }} result{{ 's' if results|length != 1 }} found for "<span style="color: #e94560;">{{ query }}</span>"
+                {% else %}
+                    No results found for "<span style="color: #e94560;">{{ query }}</span>"
+                {% endif %}
+            </p>
+
+            {% if results %}
+                {% for idea in results %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge badge-category mb-1">{{ idea.category }}</span>
+                                <h5 class="mb-1" style="color: #ffffff;">{{ idea.title }}</h5>
+                                <p style="color: #a0a0b0;" class="mb-2">{{ idea.description[:150] }}...</p>
+                                <small style="color: #a0a0b0;">
+                                    👤 {{ idea.author.name }} •
+                                    📅 {{ idea.created_at.strftime('%d %b %Y') }} •
+                                    💬 {{ idea.reviews|length }} reviews
+                                </small>
+                                {% if idea.tags %}
+                                <div class="mt-2">
+                                    {% for tag in idea.tags.split(',') %}
+                                        <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('ideas.idea_detail', idea_id=idea.id) }}"
+                               class="btn btn-sm btn-primary ms-3">View →</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center p-4">
+                        <p style="color: #a0a0b0;">Koi idea nahi mila. Kuch aur try karo!</p>
+                        <a href="{{ url_for('ideas.submit') }}" class="btn btn-primary mt-2">Submit New Idea</a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

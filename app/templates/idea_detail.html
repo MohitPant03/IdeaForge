@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Idea Card -->
+        <div class="card mb-4">
+            <div class="card-body p-4">
+                <span class="badge badge-category mb-2">{{ idea.category }}</span>
+                <h2 class="mb-1" style="color: #ffffff;">{{ idea.title }}</h2>
+                <small style="color: #a0a0b0;">by {{ idea.author.name }} • {{ idea.created_at.strftime('%d %b %Y') }}</small>
+                <hr style="border-color: #2a2a4a;">
+                <p class="mt-3" style="color: #e0e0e0;">{{ idea.description }}</p>
+                {% if idea.tags %}
+                    <div class="mt-3">
+                        {% for tag in idea.tags.split(',') %}
+                            <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+               {% if current_user.is_authenticated and current_user.id == idea.user_id %}
+<div class="mt-3 d-flex gap-2">
+    <a href="{{ url_for('ideas.edit_idea', idea_id=idea.id) }}"
+       class="btn btn-sm btn-warning">✏️ Edit Idea (-10 pts)</a>
+    
+    <!-- Delete Button with Confirmation -->
+    <button type="button" class="btn btn-sm btn-danger"
+            onclick="document.getElementById('delete-modal').style.display='flex'">
+        🗑️ Delete Idea
+    </button>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+    <div class="card p-4 text-center" style="max-width:400px; width:90%;">
+        <h5 style="color:#ffffff;" class="mb-2">🗑️ Delete Idea?</h5>
+        <p style="color:#a0a0b0;" class="mb-1">Yeh action permanent hai!</p>
+        <p style="color:#a0a0b0;" class="mb-3">Idea aur saare reviews <span style="color:#e94560;">permanently delete</span> ho jayenge.</p>
+        <div class="d-flex gap-2 justify-content-center">
+            <form method="POST" action="{{ url_for('ideas.delete_idea', idea_id=idea.id) }}">
+                <button type="submit" class="btn btn-danger">Haan, Delete Karo</button>
+            </form>
+            <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('delete-modal').style.display='none'">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+            </div>
+        </div>
+
+        <!-- AI Analysis Section -->
+        {% if strengths or weaknesses or risks or questions %}
+        <div class="card mb-4" style="border-color: #e94560;">
+            <div class="card-body p-4">
+                <h5 class="mb-3" style="color: #ffffff;">🤖 AI Analysis</h5>
+                <div class="row">
+                    {% if strengths %}
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-success">✅ Strengths</h6>
+                        <ul class="list-unstyled">
+                            {% for s in strengths %}
+                            <li class="mb-1" style="color: #e0e0e0;">• {{ s }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if weaknesses %}
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-warning">⚠️ Weaknesses</h6>
+                        <ul class="list-unstyled">
+                            {% for w in weaknesses %}
+                            <li class="mb-1" style="color: #e0e0e0;">• {{ w }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if risks %}
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-danger">🚨 Risks</h6>
+                        <ul class="list-unstyled">
+                            {% for r in risks %}
+                            <li class="mb-1" style="color: #e0e0e0;">• {{ r }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if questions %}
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-info">❓ Questions to Consider</h6>
+                        <ul class="list-unstyled">
+                            {% for q in questions %}
+                            <li class="mb-1" style="color: #e0e0e0;">• {{ q }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Reviews Section -->
+        <h4 class="mb-3" style="color: #ffffff;">💬 Community Reviews ({{ idea.reviews|length }})</h4>
+        {% if idea.reviews %}
+            {% for review in idea.reviews %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row text-center mb-3">
+                        <div class="col-3">
+                            <div class="text-danger fw-bold">{{ review.market_need }}/10</div>
+                            <small style="color: #a0a0b0;">Market Need</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="text-danger fw-bold">{{ review.originality }}/10</div>
+                            <small style="color: #a0a0b0;">Originality</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="text-danger fw-bold">{{ review.feasibility }}/10</div>
+                            <small style="color: #a0a0b0;">Feasibility</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="text-danger fw-bold">{{ review.revenue_potential }}/10</div>
+                            <small style="color: #a0a0b0;">Revenue</small>
+                        </div>
+                    </div>
+                   <div class="d-flex align-items-center mb-2">
+    <span style="color: #e94560; font-weight: bold;">👤 {{ review.reviewer.name }}</span>
+    <small style="color: #a0a0b0;" class="ms-2">• {{ review.created_at.strftime('%d %b %Y') }}</small>
+</div>
+{% if review.comment %}
+    <p class="mb-0" style="color: #e0e0e0;">{{ review.comment }}</p>
+{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-body text-center p-3">
+                    <span style="color: #a0a0b0;">No reviews yet. Be the first to review! 👇</span>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Review Form -->
+        {% if current_user.is_authenticated %}
+            {% if idea.user_id == current_user.id %}
+                <div class="card mt-4">
+                    <div class="card-body text-center p-3" style="color: #a0a0b0;">
+                        🔒 Tum apne khud ke idea ko review nahi kar sakte.
+                    </div>
+                </div>
+            {% elif user_review %}
+                <div class="card mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-1" style="color: #ffffff;">✏️ Edit Your Review</h5>
+                        <small style="color: #a0a0b0;" class="mb-3 d-block">Points nahi milenge editing ke liye</small>
+                        <form method="POST" action="{{ url_for('ideas.edit_review', idea_id=idea.id) }}">
+                            <div class="row mb-3">
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Market Need</label>
+                                    <input type="number" name="market_need" min="1" max="10"
+                                           value="{{ user_review.market_need }}"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Originality</label>
+                                    <input type="number" name="originality" min="1" max="10"
+                                           value="{{ user_review.originality }}"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Feasibility</label>
+                                    <input type="number" name="feasibility" min="1" max="10"
+                                           value="{{ user_review.feasibility }}"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Revenue</label>
+                                    <input type="number" name="revenue_potential" min="1" max="10"
+                                           value="{{ user_review.revenue_potential }}"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #e0e0e0;">Comment</label>
+                                <textarea name="comment" rows="3"
+                                          class="form-control bg-dark text-light border-secondary"
+                                          placeholder="Update your thoughts...">{{ user_review.comment }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning">Update Review ✏️</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3" style="color: #ffffff;">✍️ Write a Review</h5>
+                        <form method="POST" action="{{ url_for('ideas.review_idea', idea_id=idea.id) }}">
+                            <div class="row mb-3">
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Market Need</label>
+                                    <input type="number" name="market_need" min="1" max="10"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Originality</label>
+                                    <input type="number" name="originality" min="1" max="10"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Feasibility</label>
+                                    <input type="number" name="feasibility" min="1" max="10"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3">
+                                    <label class="form-label" style="color: #e0e0e0;">Revenue</label>
+                                    <input type="number" name="revenue_potential" min="1" max="10"
+                                           class="form-control bg-dark text-light border-secondary" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #e0e0e0;">Comment</label>
+                                <textarea name="comment" rows="3"
+                                          class="form-control bg-dark text-light border-secondary"
+                                          placeholder="Share your thoughts..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Review (+10 pts)</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+  <!-- Sidebar -->
+<div class="col-md-4">
+    <div class="card">
+        <div class="card-body">
+            <h6 style="color: #a0a0b0;">IDEA STATS</h6>
+            <hr style="border-color: #2a2a4a;">
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: #e0e0e0;">Total Reviews</span>
+                <span class="text-danger fw-bold">{{ idea.reviews|length }}</span>
+            </div>
+
+            {% if idea.reviews %}
+            <hr style="border-color: #2a2a4a;">
+
+            <!-- Market Need -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span style="color: #e0e0e0; font-size: 13px;">Market Need</span>
+                    <span class="text-danger fw-bold">{{ "%.1f"|format(idea.reviews|map(attribute='market_need')|sum / idea.reviews|length) }}/10</span>
+                </div>
+                <div style="background:#2a2a4a; border-radius:4px; height:6px;">
+                    <div style="background:#e94560; height:6px; border-radius:4px; width:{{ ((idea.reviews|map(attribute='market_need')|sum / idea.reviews|length) * 10)|int }}%"></div>
+                </div>
+            </div>
+
+            <!-- Originality -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span style="color: #e0e0e0; font-size: 13px;">Originality</span>
+                    <span class="text-danger fw-bold">{{ "%.1f"|format(idea.reviews|map(attribute='originality')|sum / idea.reviews|length) }}/10</span>
+                </div>
+                <div style="background:#2a2a4a; border-radius:4px; height:6px;">
+                    <div style="background:#e94560; height:6px; border-radius:4px; width:{{ ((idea.reviews|map(attribute='originality')|sum / idea.reviews|length) * 10)|int }}%"></div>
+                </div>
+            </div>
+
+            <!-- Feasibility -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span style="color: #e0e0e0; font-size: 13px;">Feasibility</span>
+                    <span style="color: #6c63ff; font-weight: bold;">{{ "%.1f"|format(idea.reviews|map(attribute='feasibility')|sum / idea.reviews|length) }}/10</span>
+                </div>
+                <div style="background:#2a2a4a; border-radius:4px; height:6px;">
+                    <div style="background:#6c63ff; height:6px; border-radius:4px; width:{{ ((idea.reviews|map(attribute='feasibility')|sum / idea.reviews|length) * 10)|int }}%"></div>
+                </div>
+            </div>
+
+            <!-- Revenue Potential -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span style="color: #e0e0e0; font-size: 13px;">Revenue Potential</span>
+                    <span style="color: #00b894; font-weight: bold;">{{ "%.1f"|format(idea.reviews|map(attribute='revenue_potential')|sum / idea.reviews|length) }}/10</span>
+                </div>
+                <div style="background:#2a2a4a; border-radius:4px; height:6px;">
+                    <div style="background:#00b894; height:6px; border-radius:4px; width:{{ ((idea.reviews|map(attribute='revenue_potential')|sum / idea.reviews|length) * 10)|int }}%"></div>
+                </div>
+            </div>
+
+            <hr style="border-color: #2a2a4a;">
+
+            <!-- Overall Score -->
+            <div class="text-center mt-2">
+                <div style="font-size: 2rem; font-weight: bold; color: #e94560;">
+                    {{ "%.1f"|format(
+                        (idea.reviews|map(attribute='market_need')|sum +
+                         idea.reviews|map(attribute='originality')|sum +
+                         idea.reviews|map(attribute='feasibility')|sum +
+                         idea.reviews|map(attribute='revenue_potential')|sum) /
+                        (idea.reviews|length * 4)
+                    ) }}/10
+                </div>
+                <small style="color: #a0a0b0;">Overall Score</small>
+            </div>
+
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Submitted By Card -->
+    <div class="card mt-3">
+        <div class="card-body">
+            <h6 style="color: #a0a0b0;">SUBMITTED BY</h6>
+            <hr style="border-color: #2a2a4a;">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:40px; height:40px; border-radius:50%;
+                            background-color: {{ idea.author.avatar_color or '#e94560' }};
+                            display:flex; align-items:center; justify-content:center;
+                            font-weight:bold; color:white; font-size:1.1rem; flex-shrink:0;">
+                    {{ idea.author.name[0].upper() }}
+                </div>
+                <div>
+                    <div style="color:#ffffff; font-weight:500;">{{ idea.author.name }}</div>
+                    {% if idea.author.username %}
+                    <div style="color:#e94560; font-size:12px;">@{{ idea.author.username }}</div>
+                    {% endif %}
+                    <div style="color:#a0a0b0; font-size:12px;">{{ idea.created_at.strftime('%d %b %Y') }}</div>
+                </div>
+            </div>
+            <a href="{{ url_for('profile.view_profile', user_id=idea.author.id) }}"
+               class="btn btn-sm btn-outline-danger w-100 mt-3">View Profile</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

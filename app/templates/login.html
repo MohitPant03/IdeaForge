@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card mt-5">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">🔥 Login to IdeaForge</h3>
+                
+                <!-- Google Login Button -->
+                <a href="{{ url_for('auth.google_login') }}" 
+                   class="btn w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
+                   style="background-color: #ffffff; color: #333; border: 1px solid #ddd;">
+                    <img src="https://www.google.com/favicon.ico" width="18"> 
+                    Continue with Google
+                </a>
+                
+                <div class="text-center my-3" style="color: #a0a0b0;">— or —</div>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control bg-dark text-light border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control bg-dark text-light border-secondary" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <p class="text-center mt-3" style="color: #a0a0b0;">
+                    Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-danger">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
